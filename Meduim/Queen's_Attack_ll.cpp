@@ -34,6 +34,7 @@ int queensAttack(int n, int k, int r_q, int c_q, vector<vector<int>> obstacles) 
     int upRight, downLeft;
     int nearstUpRight = n + 1, nearstDownLeft = 0;
 
+
     int secondaryDiagonal = r_q + c_q;
     int upLeft, downRight;
     int nearstUpLeft = 0, nearstDownRight = 0;
@@ -60,7 +61,6 @@ int queensAttack(int n, int k, int r_q, int c_q, vector<vector<int>> obstacles) 
         nearstDownRight = n + 1;
     }
 
-
     int temp;
     for (int i = 0; i < obstacles.size(); i++) {
         if (obstacles.at(i).at(1) == c_q) {
@@ -80,28 +80,45 @@ int queensAttack(int n, int k, int r_q, int c_q, vector<vector<int>> obstacles) 
         }
 
         if (obstacles.at(i).at(0) - obstacles.at(i).at(1) == mainDiagonal) {
-            temp = (obstacles.at(i).at(0) > obstacles.at(i).at(1)) ? obstacles.at(i).at(0) : obstacles.at(i).at(1);
-            if (temp < nearstUpRight && temp > r_q)
-                nearstUpRight = temp;
-            temp = (obstacles.at(i).at(0) < obstacles.at(i).at(1)) ? obstacles.at(i).at(0) : obstacles.at(i).at(1);
-            if (temp > nearstDownLeft && temp < r_q)
-                nearstDownLeft = temp;
+            if (r_q > c_q) {
+                // we nearer to top
+                // we use rows
+                temp = obstacles.at(i).at(0);
+                if (temp < nearstUpRight && temp > r_q)
+                    nearstUpRight = temp;
+                // we nearer to left 
+                // we use columns
+                temp = obstacles.at(i).at(1);
+                if (temp > nearstDownLeft && temp < c_q)
+                    nearstDownLeft = temp;
+            }
+            else {
+                // we nearer to right
+                // we use columns
+                temp = obstacles.at(i).at(1);
+                if (temp < nearstUpRight && temp > c_q)
+                    nearstUpRight = temp;
+                // we nearer to bottom
+                // we use rows
+                temp = obstacles.at(i).at(0);
+                if (temp > nearstDownLeft && temp < r_q)
+                    nearstDownLeft = temp;
+            }
         }
 
         if (obstacles.at(i).at(0) + obstacles.at(i).at(1) == secondaryDiagonal) {
-            printf("secondary\n");
             if (((n + 1) - r_q) > c_q) {
-                // we nearer to the top
-                // we use rows
-                temp = obstacles.at(i).at(0);
-                if (temp < nearstUpLeft && temp > r_q)
-                    nearstUpLeft = temp;
-            }
-            else {
                 // we are nearer to the left
                 // we use columns
                 temp = obstacles.at(i).at(1);
                 if (temp > nearstUpLeft && temp < c_q)
+                    nearstUpLeft = temp;
+            }
+            else {
+                // we nearer to the top
+                // we use rows
+                temp = obstacles.at(i).at(0);
+                if (temp < nearstUpLeft && temp > r_q)
                     nearstUpLeft = temp;
             }
 
@@ -125,12 +142,26 @@ int queensAttack(int n, int k, int r_q, int c_q, vector<vector<int>> obstacles) 
     down = r_q - nearstDown - 1;
     right = nearstRight - c_q - 1;
     left = c_q - nearstLeft - 1;
-    printf("up = %d, down = %d, left = %d, right = %d\n", up, down, left, right);
-    int high = (r_q > c_q) ? r_q : c_q;
-    int low = (r_q < c_q) ? r_q : c_q;
-    upRight = nearstUpRight - high - 1;
-    downLeft = low - nearstDownLeft - 1;
-    printf("nearestUpLeft = %d\n", nearstUpLeft);
+
+    /* Main Diagonal */
+    if (r_q > c_q) {
+        // we nearer to top
+        // we use rows
+        upRight = nearstUpRight - r_q - 1;
+        // we nearer to left 
+        // we use columns
+        downLeft = c_q - nearstDownLeft - 1;
+    }
+    else {
+        // we nearer to right
+        // we use columns
+        upRight = nearstUpRight - c_q - 1;
+        // we nearer to bottom
+        // we use rows
+        downLeft = r_q - nearstDownLeft - 1;
+    }
+
+    /* Secondary Diagonal */
     if (((n + 1) - r_q) > c_q) {
         // we nearer to the left
         // we use columns
@@ -152,111 +183,10 @@ int queensAttack(int n, int k, int r_q, int c_q, vector<vector<int>> obstacles) 
         // we use columns
         downRight = nearstDownRight - c_q - 1;
     }
-    printf("upRight = %d, downLeft = %d, upLeft = %d, downRight = %d\n", upRight, downLeft, upLeft, downRight);
-    /*
-        up left we have 2 cases
-        1- we nearer to the top
-        2- we are nearer to the left
-        in case 1
-            if(no blocks)
-                n+1 - row
-            else
-                block row - row
-                column - block column
-        in case 2
-            if(no blocks)
-                column - 0
-            else
-
-    */
+    
     return up + down + right + left + upRight + upLeft + downRight + downLeft;
 }
-//// bool** chessBoard = new bool*[r_q+1];
-//    // int i, j;
-//    // for(i=0; i< r_q+1; i++){
-//    //     chessBoard[i] = new bool[c_q+1];
-//    // }
-//bool chessBoard[10001][10001];
-//int i, j;
-//for (i = 0; i < n + 1; i++) {
-//    for (j = 0; j < n + 1; j++) {
-//        chessBoard[i][j] = false;
-//    }
-//}
-//for (int k = 0; k < obstacles.size(); k++) {
-//    chessBoard[obstacles.at(k).at(0)][obstacles.at(k).at(1)] = true;
-//}
-//
-///* Start Counting Available Squares */
-//int count = 0;
-//int cpyr_q, cpyc_q;
-//
-//// Count squares of the queen's column
-//cpyc_q = c_q;
-//cpyr_q = r_q + 1;
-//while (cpyr_q != n + 1 && !chessBoard[cpyr_q][cpyc_q]) {
-//    count++;
-//    cpyr_q++;
-//}
-//cpyr_q = r_q - 1;
-//while (cpyr_q != 0 && !chessBoard[cpyr_q][cpyc_q]) {
-//    count++;
-//    cpyr_q--;
-//}
-//// Count squares of the queen's row 
-//cpyr_q = r_q;
-//cpyc_q = c_q + 1;
-//while (cpyc_q != n + 1 && !chessBoard[cpyr_q][cpyc_q]) {
-//    count++;
-//    cpyc_q++;
-//}
-//cpyc_q = c_q - 1;
-//while (cpyc_q != 0 && !chessBoard[cpyr_q][cpyc_q]) {
-//    count++;
-//    cpyc_q--;
-//}
-//
-//// Count squares of the diagonals
-//// 1- Up Right
-//cpyc_q = c_q + 1;
-//cpyr_q = r_q + 1;
-//while (cpyc_q != n + 1 && cpyr_q != n + 1 && !chessBoard[cpyr_q][cpyc_q]) {
-//    count++;
-//    cpyr_q++;
-//    cpyc_q++;
-//}
-//
-//// 2- Up Left
-//cpyc_q = c_q - 1;
-//cpyr_q = r_q + 1;
-//while (cpyc_q != 0 && cpyr_q != n + 1 && !chessBoard[cpyr_q][cpyc_q]) {
-//    count++;
-//    cpyr_q++;
-//    cpyc_q--;
-//}
-//
-//// 3- Down Right
-//cpyc_q = c_q + 1;
-//cpyr_q = r_q - 1;
-//while (cpyc_q != n + 1 && cpyr_q != 0 && !chessBoard[cpyr_q][cpyc_q]) {
-//    count++;
-//    cpyr_q--;
-//    cpyc_q++;
-//}
-//
-//// 4- Down Left
-//cpyc_q = c_q - 1;
-//cpyr_q = r_q - 1;
-//while (cpyc_q != 0 && cpyr_q != 0 && !chessBoard[cpyr_q][cpyc_q]) {
-//    count++;
-//    cpyr_q--;
-//    cpyc_q--;
-//}
-//// for(i=0; i< r_q+1; i++){
-////     delete chessBoard[i];
-//// }
-//// delete[] chessBoard;
-//return count;
+
 int main()
 {
     ofstream fout(getenv("OUTPUT_PATH"));
